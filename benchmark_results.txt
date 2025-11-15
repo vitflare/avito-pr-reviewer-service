@@ -1,0 +1,22 @@
+2025/11/15 21:04:12 INFO configuration loaded port=8080 db_host=localhost
+goos: darwin
+goarch: arm64
+pkg: pr-reviewer-service/tests
+cpu: Apple M2 Pro
+BenchmarkBatchDeactivateUsers/Small_10users_5deactivate_20prs-10         	     457	  28853093 ns/op	   93381 B/op	    1691 allocs/op
+--- BENCH: BenchmarkBatchDeactivateUsers/Small_10users_5deactivate_20prs-10
+    benchmark_test.go:136: First run - Deactivated: 5 users, PRs reassigned: 12, Time: 23.294541ms
+    benchmark_test.go:136: First run - Deactivated: 5 users, PRs reassigned: 19, Time: 32.148292ms
+    benchmark_test.go:136: First run - Deactivated: 5 users, PRs reassigned: 13, Time: 13.363458ms
+    benchmark_test.go:136: First run - Deactivated: 5 users, PRs reassigned: 14, Time: 17.375125ms
+BenchmarkBatchDeactivateUsers/Medium_50users_25deactivate_100prs-10      	     100	 162999015 ns/op	 2018955 B/op	   18385 allocs/op
+--- BENCH: BenchmarkBatchDeactivateUsers/Medium_50users_25deactivate_100prs-10
+    benchmark_test.go:136: First run - Deactivated: 25 users, PRs reassigned: 74, Time: 94.83475ms
+    benchmark_test.go:136: First run - Deactivated: 25 users, PRs reassigned: 83, Time: 94.797208ms
+BenchmarkBatchDeactivateUsers/Large_100users_50deactivate_500prs-10      	      26	 759333570 ns/op	17924337 B/op	  136100 allocs/op
+--- BENCH: BenchmarkBatchDeactivateUsers/Large_100users_50deactivate_500prs-10
+    benchmark_test.go:136: First run - Deactivated: 50 users, PRs reassigned: 386, Time: 447.828083ms
+    benchmark_test.go:136: First run - Deactivated: 50 users, PRs reassigned: 390, Time: 454.506375ms
+BenchmarkSingleUserDeactivation-10                      15549	    775333 ns/op	     308 B/op	       8 allocs/op
+PASS
+ok  	pr-reviewer-service/tests	85.269s

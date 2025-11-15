@@ -1,0 +1,11 @@
+services:
+  postgres-test:
+    image: postgres:15
+    container_name: pr_reviewer_test_db
+    pull_policy: missing
+    ports:
+      - "5433:5432"
+    environment:
+      - POSTGRES_USER=avito-test
+      - POSTGRES_PASSWORD=avito-test
+      - POSTGRES_DB=pr_reviewer_test

@@ -1,0 +1,74 @@
+services:
+  postgres:
+    image: postgres:15
+    pull_policy: missing
+    ports:
+      - "${POSTGRES_PORT}:5432"
+    env_file:
+      - .env
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    networks:
+      - pr-reviewer-network
+
+  goose:
+    image: ghcr.io/kukymbr/goose-docker:latest
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - ./migrations:/migrations
+    environment:
+      GOOSE_DRIVER: postgres
+      GOOSE_DBSTRING: "host=postgres user=${POSTGRES_USER} password=${POSTGRES_PASSWORD} dbname=${POSTGRES_DB} sslmode=disable"
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - pr-reviewer-network
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: pr-reviewer-app
+    ports:
+      - "8080:${PORT}"
+    environment:
+      PORT: ${PORT}
+      POSTGRES_HOST: ${POSTGRES_HOST}
+      POSTGRES_PORT: ${POSTGRES_PORT}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_SSLMODE: ${POSTGRES_SSLMODE}
+      DB_MAX_CONNS: ${DB_MAX_CONNS}
+      DB_MIN_CONNS: ${DB_MIN_CONNS}
+      JWT_SECRET: ${JWT_SECRET}
+      DB_MAX_CONN_LIFETIME: ${DB_MAX_CONN_LIFETIME}
+      DB_MAX_CONN_IDLE_TIME: ${DB_MAX_CONN_IDLE_TIME}
+      DB_HEALTH_CHECK_PERIOD: ${DB_HEALTH_CHECK_PERIOD}
+    depends_on:
+      goose:
+        condition: service_completed_successfully
+    networks:
+      - pr-reviewer-network
+
+volumes:
+  db_data:
+
+networks:
+  pr-reviewer-network:
+    driver: bridge

@@ -1,0 +1,80 @@
+version: "2"
+run:
+  go: 1.25.3
+  tests: true
+linters:
+  default: none
+  enable:
+    - errcheck
+    - gocritic
+    - govet
+    - ineffassign
+    - misspell
+    - staticcheck
+    - unconvert
+    - unparam
+    - unused
+    - whitespace
+  settings:
+    errcheck:
+      check-type-assertions: true
+    funlen:
+      lines: 150
+      statements: 80
+    gocyclo:
+      min-complexity: 20
+    govet:
+      enable-all: true
+    lll:
+      line-length: 150
+  exclusions:
+    generated: lax
+    presets:
+      - comments
+      - common-false-positives
+      - legacy
+      - std-error-handling
+    rules:
+      - linters:
+          - errcheck
+          - funlen
+        path: _test\.go
+      - linters:
+          - funlen
+          - gocyclo
+        path: cmd/api/main\.go
+      - linters:
+          - lll
+        path: docs/
+      - linters:
+          - govet
+        text: 'shadow: declaration of "(err|ctx)"'
+    paths:
+      - vendor
+      - docs
+      - bin
+      - third_party$
+      - builtin$
+      - examples$
+issues:
+  max-issues-per-linter: 50
+  max-same-issues: 3
+formatters:
+  enable:
+    - gofmt
+    - goimports
+  settings:
+    gofmt:
+      simplify: true
+    goimports:
+      local-prefixes:
+        - pr-reviewer-service
+  exclusions:
+    generated: lax
+    paths:
+      - vendor
+      - docs
+      - bin
+      - third_party$
+      - builtin$
+      - examples$

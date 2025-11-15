@@ -1,0 +1,794 @@
+definitions:
+  dto.ErrorDetail:
+    properties:
+      code:
+        type: string
+      message:
+        type: string
+    type: object
+  dto.ErrorResponse:
+    properties:
+      error:
+        $ref: '#/definitions/dto.ErrorDetail'
+    type: object
+  dto.PullRequestDTO:
+    properties:
+      assigned_reviewers:
+        items:
+          type: string
+        type: array
+      author_id:
+        type: string
+      createdAt:
+        type: string
+      mergedAt:
+        type: string
+      pull_request_id:
+        type: string
+      pull_request_name:
+        type: string
+      status:
+        type: string
+    type: object
+  dto.PullRequestShortDTO:
+    properties:
+      author_id:
+        type: string
+      pull_request_id:
+        type: string
+      pull_request_name:
+        type: string
+      status:
+        type: string
+    type: object
+  dto.TeamDTO:
+    properties:
+      members:
+        items:
+          $ref: '#/definitions/dto.TeamMemberDTO'
+        type: array
+      team_name:
+        type: string
+    type: object
+  dto.TeamMemberDTO:
+    properties:
+      is_active:
+        type: boolean
+      user_id:
+        type: string
+      username:
+        type: string
+    type: object
+  dto.UserAssignmentStatDTO:
+    properties:
+      merged_assignments:
+        type: integer
+      open_assignments:
+        type: integer
+      team_name:
+        type: string
+      total_assignments:
+        type: integer
+      user_id:
+        type: string
+      username:
+        type: string
+    type: object
+  dto.UserDTO:
+    properties:
+      is_active:
+        type: boolean
+      team_name:
+        type: string
+      user_id:
+        type: string
+      username:
+        type: string
+    type: object
+  request.BatchDeactivateTeamRequest:
+    properties:
+      team_name:
+        maxLength: 255
+        minLength: 1
+        type: string
+    required:
+    - team_name
+    type: object
+  request.BatchDeactivateUsersRequest:
+    properties:
+      user_ids:
+        items:
+          type: string
+        minItems: 1
+        type: array
+    required:
+    - user_ids
+    type: object
+  request.CreatePRRequest:
+    properties:
+      author_id:
+        maxLength: 255
+        minLength: 1
+        type: string
+      pull_request_id:
+        maxLength: 255
+        minLength: 1
+        type: string
+      pull_request_name:
+        maxLength: 500
+        minLength: 1
+        type: string
+    required:
+    - author_id
+    - pull_request_id
+    - pull_request_name
+    type: object
+  request.CreateTeamRequest:
+    properties:
+      members:
+        items:
+          $ref: '#/definitions/request.TeamMemberInput'
+        minItems: 1
+        type: array
+      team_name:
+        maxLength: 255
+        minLength: 1
+        type: string
+    required:
+    - members
+    - team_name
+    type: object
+  request.LoginRequest:
+    properties:
+      user_id:
+        type: string
+    required:
+    - user_id
+    type: object
+  request.MergePRRequest:
+    properties:
+      pull_request_id:
+        maxLength: 255
+        minLength: 1
+        type: string
+    required:
+    - pull_request_id
+    type: object
+  request.ReassignPRRequest:
+    properties:
+      old_user_id:
+        maxLength: 255
+        minLength: 1
+        type: string
+      pull_request_id:
+        maxLength: 255
+        minLength: 1
+        type: string
+    required:
+    - old_user_id
+    - pull_request_id
+    type: object
+  request.SetUserActiveRequest:
+    properties:
+      is_active:
+        type: boolean
+      user_id:
+        maxLength: 255
+        minLength: 1
+        type: string
+    required:
+    - user_id
+    type: object
+  request.TeamMemberInput:
+    properties:
+      is_active:
+        type: boolean
+      user_id:
+        maxLength: 255
+        minLength: 1
+        type: string
+      username:
+        maxLength: 255
+        minLength: 1
+        type: string
+    required:
+    - user_id
+    - username
+    type: object
+  response.AllTeamsResponse:
+    properties:
+      count:
+        type: integer
+      teams:
+        items:
+          $ref: '#/definitions/dto.TeamDTO'
+        type: array
+    type: object
+  response.AllUsersResponse:
+    properties:
+      count:
+        type: integer
+      users:
+        items:
+          $ref: '#/definitions/dto.UserDTO'
+        type: array
+    type: object
+  response.BatchDeactivateResponse:
+    properties:
+      deactivated_users:
+        items:
+          type: string
+        type: array
+      processing_time_ms:
+        type: integer
+      reassigned_prs:
+        items:
+          $ref: '#/definitions/response.PRReassignmentInfo'
+        type: array
+      skipped_users:
+        items:
+          type: string
+        type: array
+      total_deactivated:
+        type: integer
+      total_prs_reassigned:
+        type: integer
+    type: object
+  response.LoginResponse:
+    properties:
+      token:
+        type: string
+      user_id:
+        type: string
+    type: object
+  response.PRReassignmentInfo:
+    properties:
+      new_reviewers:
+        items:
+          type: string
+        type: array
+      old_reviewers:
+        items:
+          type: string
+        type: array
+      pull_request_id:
+        type: string
+    type: object
+  response.PRResponse:
+    properties:
+      pr:
+        $ref: '#/definitions/dto.PullRequestDTO'
+    type: object
+  response.ReassignResponse:
+    properties:
+      pr:
+        $ref: '#/definitions/dto.PullRequestDTO'
+      replaced_by:
+        type: string
+    type: object
+  response.StatisticsResponse:
+    properties:
+      active_users:
+        type: integer
+      merged_prs:
+        type: integer
+      open_prs:
+        type: integer
+      total_prs:
+        type: integer
+      total_teams:
+        type: integer
+      total_users:
+        type: integer
+      user_assignments:
+        items:
+          $ref: '#/definitions/dto.UserAssignmentStatDTO'
+        type: array
+    type: object
+  response.TeamResponse:
+    properties:
+      team:
+        $ref: '#/definitions/dto.TeamDTO'
+    type: object
+  response.UserResponse:
+    properties:
+      user:
+        $ref: '#/definitions/dto.UserDTO'
+    type: object
+  response.UserReviewsResponse:
+    properties:
+      pull_requests:
+        items:
+          $ref: '#/definitions/dto.PullRequestShortDTO'
+        type: array
+      user_id:
+        type: string
+    type: object
+info:
+  contact: {}
+  description: Service for automatic PR reviewer assignment
+  title: PR Reviewer Assignment Service API
+  version: "1.0"
+paths:
+  /admin/teams:
+    get:
+      consumes:
+      - application/json
+      description: Get list of all teams with their members
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Teams retrieved successfully
+          schema:
+            $ref: '#/definitions/response.AllTeamsResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "403":
+          description: Forbidden - Admin access required
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: List all teams (Admin only)
+      tags:
+      - Teams
+  /admin/users:
+    get:
+      consumes:
+      - application/json
+      description: Get list of all users in the system
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Users retrieved successfully
+          schema:
+            $ref: '#/definitions/response.AllUsersResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "403":
+          description: Forbidden - Admin access required
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: List all users (Admin only)
+      tags:
+      - Users
+  /auth/login:
+    post:
+      consumes:
+      - application/json
+      description: Generate authentication token for a user by user_id
+      parameters:
+      - description: Login request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/request.LoginRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Token generated successfully
+          schema:
+            $ref: '#/definitions/response.LoginResponse'
+        "400":
+          description: Invalid request
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      summary: Generate JWT token for user
+      tags:
+      - Auth
+  /pullRequest/create:
+    post:
+      consumes:
+      - application/json
+      description: Create a PR and automatically assign up to 2 reviewers from author's
+        team
+      parameters:
+      - description: PR creation request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/request.CreatePRRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: PR created successfully
+          schema:
+            $ref: '#/definitions/response.PRResponse'
+        "400":
+          description: Invalid request
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "404":
+          description: Author not found
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "409":
+          description: PR already exists
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Create a new pull request
+      tags:
+      - PullRequests
+  /pullRequest/merge:
+    post:
+      consumes:
+      - application/json
+      description: Mark PR as MERGED (idempotent operation)
+      parameters:
+      - description: Merge PR request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/request.MergePRRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: PR merged successfully
+          schema:
+            $ref: '#/definitions/response.PRResponse'
+        "400":
+          description: Invalid request
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "404":
+          description: PR not found
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Merge a pull request
+      tags:
+      - PullRequests
+  /pullRequest/reassign:
+    post:
+      consumes:
+      - application/json
+      description: Replace one reviewer with another from the same team
+      parameters:
+      - description: Reassign reviewer request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/request.ReassignPRRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Reviewer reassigned successfully
+          schema:
+            $ref: '#/definitions/response.ReassignResponse'
+        "400":
+          description: Invalid request
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "404":
+          description: PR or user not found
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "409":
+          description: Cannot reassign (PR merged, user not assigned, or no candidates)
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Reassign a reviewer on PR
+      tags:
+      - PullRequests
+  /statistics:
+    get:
+      consumes:
+      - application/json
+      description: Get comprehensive statistics about PRs, users, teams, and reviewer
+        assignments
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Statistics retrieved successfully
+          schema:
+            $ref: '#/definitions/response.StatisticsResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Get service statistics
+      tags:
+      - Statistics
+  /team/add:
+    post:
+      consumes:
+      - application/json
+      description: Create a team and add/update users as members
+      parameters:
+      - description: Team creation request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/request.CreateTeamRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Team created successfully
+          schema:
+            $ref: '#/definitions/response.TeamResponse'
+        "400":
+          description: Team already exists or validation error
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Create a new team with members
+      tags:
+      - Teams
+  /team/get:
+    get:
+      consumes:
+      - application/json
+      description: Get team information with all members
+      parameters:
+      - description: Team name
+        in: query
+        name: team_name
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Team retrieved successfully
+          schema:
+            $ref: '#/definitions/dto.TeamDTO'
+        "400":
+          description: Invalid request
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "404":
+          description: Team not found
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Get team by name
+      tags:
+      - Teams
+  /users/batchDeactivateTeam:
+    post:
+      consumes:
+      - application/json
+      description: Deactivate all members of a team and safely reassign their open
+        PRs
+      parameters:
+      - description: Batch deactivate team request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/request.BatchDeactivateTeamRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Team members deactivated and PRs reassigned
+          schema:
+            $ref: '#/definitions/response.BatchDeactivateResponse'
+        "400":
+          description: Invalid request
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "403":
+          description: Forbidden - Admin access required or cannot deactivate admin
+            team
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Batch deactivate team members (Admin only)
+      tags:
+      - Users
+  /users/batchDeactivateUsers:
+    post:
+      consumes:
+      - application/json
+      description: Deactivate specified users and safely reassign their open PRs
+      parameters:
+      - description: Batch deactivate users request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/request.BatchDeactivateUsersRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Users deactivated and PRs reassigned
+          schema:
+            $ref: '#/definitions/response.BatchDeactivateResponse'
+        "400":
+          description: Invalid request
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "403":
+          description: Forbidden - Admin access required
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Batch deactivate users (Admin only)
+      tags:
+      - Users
+  /users/getReview:
+    get:
+      consumes:
+      - application/json
+      description: Get list of pull requests where user is assigned as reviewer
+      parameters:
+      - description: User ID
+        in: query
+        name: user_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: User reviews retrieved successfully
+          schema:
+            $ref: '#/definitions/response.UserReviewsResponse'
+        "400":
+          description: Invalid request
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Get PRs assigned to user
+      tags:
+      - Users
+  /users/setIsActive:
+    post:
+      consumes:
+      - application/json
+      description: Update user's active status. Admin users cannot be deactivated.
+      parameters:
+      - description: Set active request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/request.SetUserActiveRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: User status updated successfully
+          schema:
+            $ref: '#/definitions/response.UserResponse'
+        "400":
+          description: Invalid request
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "403":
+          description: Forbidden - Admin access required or cannot deactivate admin
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "404":
+          description: User not found
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Set user active status (Admin only)
+      tags:
+      - Users
+securityDefinitions:
+  BearerAuth:
+    description: Type "Bearer" followed by a space and JWT token.
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"
