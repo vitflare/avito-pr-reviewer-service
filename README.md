@@ -65,10 +65,7 @@ make run
 - `GET /admin/users` - Листинг всех пользователей
 - `POST /users/setIsActive` - Установить статус активности
 - `POST /users/batchDeactivateTeam` - Массовая деактивация пользователей в команде
-- - `POST /users/batchDeactivateUsers` - Массовая деактивация перечисленных в запросе пользователей
-
-### Health
-- `GET /health` - Проверка здоровья сервиса
+- `POST /users/batchDeactivateUsers` - Массовая деактивация перечисленных в запросе пользователей
 
 ## Переменные окружения
 Можно посмотреть в [этом](.env.example) файле
