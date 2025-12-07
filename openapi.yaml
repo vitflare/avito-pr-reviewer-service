@@ -1,0 +1,249 @@
+openapi: 3.0.3
+info:
+  title: PR Reviewer Assignment Service (Test Task, Fall 2025)
+  version: "1.0.0"
+
+tags:
+  - name: Teams
+  - name: Users
+  - name: PullRequests
+  - name: Health
+
+components:
+  parameters:
+    TeamNameQuery:
+      name: team_name
+      in: query
+      required: true
+      schema:
+        type: string
+      description: Уникальное имя команды
+    UserIdQuery:
+      name: user_id
+      in: query
+      required: true
+      schema:
+        type: string
+      description: Идентификатор пользователя
+  schemas:
+    ErrorResponse:
+      type: object
+      required: [error]
+      properties:
+        error:
+          type: object
+          required: [code, message]
+          properties:
+            code:
+              type: string
+              enum:
+                - TEAM_EXISTS
+                - PR_EXISTS
+                - PR_MERGED
+                - NOT_ASSIGNED
+                - NO_CANDIDATE
+                - NOT_FOUND
+            message:
+              type: string
+      example:
+        error:
+          code: NOT_FOUND
+          message: resource not found
+    TeamMember:
+      type: object
+      required: [ user_id, username, is_active ]
+      properties:
+        user_id:
+          type: string
+        username:
+          type: string
+        is_active:
+          type: boolean
+    Team:
+      type: object
+      required: [ team_name, members]
+      properties:
+        team_name:
+          type: string
+        members:
+          type: array
+          items:
+            $ref: '#/components/schemas/TeamMember'
+    User:
+      type: object
+      required: [ user_id, username, team_name, is_active ]
+      properties:
+        user_id:
+          type: string
+        username:
+          type: string
+        team_name:
+          type: string
+        is_active:
+          type: boolean
+    PullRequest:
+      type: object
+      required: [ pull_request_id, pull_request_name, author_id, status, assigned_reviewers]
+      properties:
+        pull_request_id:
+          type: string
+        pull_request_name:
+          type: string
+        author_id:
+          type: string
+        status:
+          type: string
+          enum: [OPEN, MERGED]
+        assigned_reviewers:
+          type: array
+          items:
+            type: string
+          description: user_id назначенных ревьюверов (0..2)
+        createdAt:
+          type: string
+          format: date-time
+          nullable: true
+        mergedAt:
+          type: string
+          format: date-time
+          nullable: true
+    PullRequestShort:
+      type: object
+      required: [ pull_request_id, pull_request_name, author_id, status]
+      properties:
+        pull_request_id:
+          type: string
+        pull_request_name:
+          type: string
+        author_id:
+          type: string
+        status:
+          type: string
+          enum: [OPEN, MERGED]
+
+paths:
+  /team/add:
+    post:
+      tags: [Teams]
+      summary: Создать команду с участниками (создаёт/обновляет пользователей)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Team'
+            example:
+              team_name: payments
+              members:
+                - user_id: u1
+                  username: Alice
+                  is_active: true
+                - user_id: u2
+                  username: Bob
+                  is_active: true
+      responses:
+        '201':
+          description: Команда создана
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  team:
+                    $ref: '#/components/schemas/Team'
+              example:
+                team:
+                  team_name: backend
+                  members:
+                    - user_id: u1
+                      username: Alice
+                      is_active: true
+                    - user_id: u2
+                      username: Bob
+                      is_active: true
+        '400':
+          description: Команда уже существует
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+              example:
+                error:
+                  code: TEAM_EXISTS
+                  message: team_name already exists
+
+  /team/get:
+    get:
+      tags: [Teams]
+      summary: Получить команду с участниками
+      parameters:
+        - $ref: '#/components/parameters/TeamNameQuery'
+      responses:
+        '200':
+          description: Объект команды
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Team'
+              example:
+                team_name: backend
+                members:
+                  - user_id: u1
+                    username: Alice
+                    is_active: true
+                  - user_id: u2
+                    username: Bob
+                    is_active: true
+        '404':
+          description: Команда не найдена
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+
+  /users/setIsActive:
+    post:
+      tags: [Users]
+      summary: Установить флаг активности пользователя
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [ user_id, is_active ]
+              properties:
+                user_id:
+                  type: string
+                is_active:
+                  type: boolean
+            example:
+              user_id: u2
+              is_active: false
+      responses:
+        '200':
+          description: Обновлённый пользователь
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  user:
+                    $ref: '#/components/schemas/User'
+              example:
+                user:
+                  user_id: u2
+                  username: Bob
+                  team_name: backend
+                  is_active: false
+        '404':
+          description: Пользователь не найден
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        '401':
+          description: Нет/неверный админский токен
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+
+  /pullRequest/create:
+    post:
